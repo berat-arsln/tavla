@@ -1,414 +1,256 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
+
     <title>Türk Tavlası</title>
 
+    <meta
+        name="description"
+        content="Firebase destekli çevrim içi Türk Tavlası"
+    >
+
+    <meta
+        name="theme-color"
+        content="#1f2937"
+    >
+
     <!-- CSS -->
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/board.css">
-    <link rel="stylesheet" href="css/game.css">
-    <link rel="stylesheet" href="css/profile.css">
-    <link rel="stylesheet" href="css/chat.css">
-    <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/board.css">
+    <link rel="stylesheet" href="./css/game.css">
+    <link rel="stylesheet" href="./css/profile.css">
+    <link rel="stylesheet" href="./css/chat.css">
+    <link rel="stylesheet" href="./css/settings.css">
+    <link rel="stylesheet" href="./css/responsive.css">
 </head>
 
-<body>
+<body class="theme-light">
 
-    <!-- Bildirimler -->
-    <div id="notification-container"></div>
+    <!-- APP ROOT -->
+    <div
+        id="app-root"
+        class="app app--loading"
+    >
 
-    <!-- Uygulama -->
-    <div id="app">
+        <!-- TOP BAR -->
+        <header
+            id="top-bar"
+            class="top-bar"
+        >
 
-        <!-- Ana Menü -->
-        <section id="main-menu" class="screen active">
-
-            <header class="main-header">
-                <h1>Türk Tavlası</h1>
-                <button id="notification-btn">🔔</button>
-            </header>
-
-            <div class="menu-buttons">
-
-                <button id="online-play-btn">
-                    🎲 Online Oyna
-                </button>
-
-                <button id="ai-play-btn">
-                    🤖 AI'ya Karşı Oyna
-                </button>
-
-                <button id="local-play-btn">
-                    📱 Yerel Oyna
-                </button>
-
-                <button id="profile-btn">
-                    👤 Profil
-                </button>
-
-                <button id="settings-btn">
-                    ⚙️ Ayarlar
-                </button>
-
+            <div class="top-bar__player">
+                <span id="player-one-name">
+                    Oyuncu 1
+                </span>
             </div>
 
-        </section>
+            <div class="top-bar__score">
+                <span id="match-score">
+                    0 - 0
+                </span>
+            </div>
 
-        <!-- Profil -->
-        <section id="profile-screen" class="screen hidden">
+            <div class="top-bar__timer">
+                <span id="turn-timer">
+                    --:--
+                </span>
+            </div>
 
-            <header class="screen-header">
-                <button class="back-btn">←</button>
-                <h2>Profil</h2>
-            </header>
+            <div class="top-bar__status">
+                <span id="connection-status">
+                    Çevrimdışı
+                </span>
+            </div>
 
-            <div id="profile-info">
+            <div class="top-bar__player">
+                <span id="player-two-name">
+                    Oyuncu 2
+                </span>
+            </div>
 
-                <div class="profile-card">
+        </header>
 
-                    <div class="avatar">
-                        👤
+        <!-- MAIN LAYOUT -->
+        <main class="layout">
+
+            <!-- BOARD AREA -->
+            <section
+                class="layout__board"
+                aria-label="Oyun Tahtası"
+            >
+
+                <div
+                    id="board-container"
+                    class="board board--self"
+                >
+
+                    <!-- Dice Area -->
+                    <div
+                        id="dice-area"
+                        class="dice"
+                    >
+                        <div class="dice__item">
+                            <span class="dice__value">-</span>
+                        </div>
+
+                        <div class="dice__item">
+                            <span class="dice__value">-</span>
+                        </div>
                     </div>
 
-                    <h3 id="display-name">
-                        Görünen Ad
-                    </h3>
-
-                    <p id="username">
-                        @kullanici
-                    </p>
-
-                    <p id="elo-rating">
-                        ELO: 1000
-                    </p>
-
-                    <p id="rank-title">
-                        Oyuncu
-                    </p>
+                    <!-- Board Render Target -->
+                    <div
+                        id="board-render-area"
+                        aria-label="Tavla Tahtası"
+                    ></div>
 
                 </div>
 
-            </div>
+            </section>
+
+            <!-- SIDEBAR -->
+            <aside
+                class="layout__sidebar"
+                aria-label="Yan Paneller"
+            >
+
+                <!-- HISTORY PANEL -->
+                <section
+                    id="history-panel"
+                    class="panel panel--closed history-panel"
+                >
+
+                    <h2>
+                        Hamle Geçmişi
+                    </h2>
+
+                    <div
+                        class="history-panel__list"
+                        id="history-list"
+                    ></div>
+
+                </section>
+
+                <!-- CHAT PANEL -->
+                <section
+                    id="chat-panel"
+                    class="panel panel--closed chat-panel"
+                >
+
+                    <h2>
+                        Sohbet
+                    </h2>
+
+                    <div
+                        class="chat-panel__messages"
+                        id="chat-messages"
+                    ></div>
+
+                    <div class="chat-panel__input">
+
+                        <input
+                            type="text"
+                            id="chat-input"
+                            maxlength="250"
+                            placeholder="Mesaj yaz..."
+                            aria-label="Mesaj Yaz"
+                        >
+
+                        <button
+                            id="chat-send-button"
+                            class="btn btn--primary"
+                            aria-label="Mesaj Gönder"
+                        >
+                            Gönder
+                        </button>
 
-            <div class="profile-actions">
-
-                <button id="create-profile-btn">
-                    Yeni Profil
-                </button>
-
-                <button id="switch-profile-btn">
-                    Profil Değiştir
-                </button>
-
-                <button id="delete-profile-btn">
-                    Profil Sil
-                </button>
-
-            </div>
-
-        </section>
-
-        <!-- Arkadaşlar -->
-        <section id="friends-screen" class="screen hidden">
-
-            <header class="screen-header">
-                <button class="back-btn">←</button>
-                <h2>Arkadaşlar</h2>
-            </header>
-
-            <input
-                type="text"
-                id="friend-search"
-                placeholder="@kullaniciadi">
-
-            <button id="friend-search-btn">
-                Ara
-            </button>
-
-            <div id="friend-search-results"></div>
-
-            <div id="friend-requests"></div>
-
-            <div id="friend-list"></div>
-
-        </section>
-
-        <!-- Liderlik Tablosu -->
-        <section id="leaderboard-screen" class="screen hidden">
-
-            <header class="screen-header">
-                <button class="back-btn">←</button>
-                <h2>Sıralama</h2>
-            </header>
-
-            <div id="leaderboard-list"></div>
-
-        </section>
-
-        <!-- Online Oyun -->
-        <section id="online-screen" class="screen hidden">
-
-            <header class="screen-header">
-                <button class="back-btn">←</button>
-                <h2>Online Oyna</h2>
-            </header>
-
-            <button id="create-room-btn">
-                Oda Oluştur
-            </button>
-
-            <button id="join-room-btn">
-                Oda Koduyla Katıl
-            </button>
-
-            <button id="friend-invite-btn">
-                Arkadaş Davet Et
-            </button>
-
-        </section>
-
-        <!-- AI Oyna -->
-        <section id="ai-screen" class="screen hidden">
-
-            <header class="screen-header">
-                <button class="back-btn">←</button>
-                <h2>AI Modu</h2>
-            </header>
-
-            <div class="difficulty-list">
-
-                <button data-difficulty="beginner">
-                    Başlangıç
-                </button>
-
-                <button data-difficulty="medium">
-                    Orta
-                </button>
-
-                <button data-difficulty="hard">
-                    Zor
-                </button>
-
-                <button data-difficulty="legend">
-                    Efsane
-                </button>
-
-            </div>
-
-        </section>
-
-        <!-- Yerel Oyun -->
-        <section id="local-screen" class="screen hidden">
-
-            <header class="screen-header">
-                <button class="back-btn">←</button>
-                <h2>Yerel Oyun</h2>
-            </header>
-
-            <input
-                type="text"
-                id="player1-name"
-                placeholder="Oyuncu 1">
-
-            <input
-                type="text"
-                id="player2-name"
-                placeholder="Oyuncu 2">
-
-            <button id="start-local-game">
-                Oyunu Başlat
-            </button>
-
-        </section>
-
-        <!-- Ayarlar -->
-        <section id="settings-screen" class="screen hidden">
-
-            <header class="screen-header">
-                <button class="back-btn">←</button>
-                <h2>Ayarlar</h2>
-            </header>
-
-            <div class="settings-group">
-
-                <h3>Oyun Ayarları</h3>
-
-                <label>
-                    Taş Hareketi
-                    <select id="move-mode">
-                        <option value="tap">
-                            Dokun
-                        </option>
-                        <option value="drag">
-                            Sürükle Bırak
-                        </option>
-                    </select>
-                </label>
-
-                <label>
-                    Zar Sistemi
-                    <select id="dice-mode">
-                        <option value="auto">
-                            Otomatik
-                        </option>
-                        <option value="manual">
-                            Manuel
-                        </option>
-                    </select>
-                </label>
-
-                <label>
-                    Tahta Görünümü
-                    <select id="board-view">
-                        <option value="player">
-                            Kendi Tarafım
-                        </option>
-                        <option value="shared">
-                            Ortak Görünüm
-                        </option>
-                    </select>
-                </label>
-
-            </div>
-
-            <div class="settings-group">
-
-                <h3>Tema</h3>
-
-                <button id="light-theme">
-                    Açık Mod
-                </button>
-
-                <button id="dark-theme">
-                    Koyu Mod
-                </button>
-
-            </div>
-
-            <div class="settings-group">
-
-                <h3>Ses</h3>
-
-                <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value="100"
-                    id="volume-slider">
-
-            </div>
-
-            <div class="settings-group">
-
-                <h3>Nasıl Oynanır?</h3>
-
-                <button id="rules-btn">
-                    Kuralları Aç
-                </button>
-
-            </div>
-
-            <div class="settings-group">
-
-                <p id="version">
-                    v1.0.0
-                </p>
-
-            </div>
-
-        </section>
-
-        <!-- Oyun Ekranı -->
-        <section id="game-screen" class="screen hidden">
-
-            <header id="game-header">
-
-                <div id="player-top"></div>
-
-                <div id="game-info">
-
-                    <span id="score-display">
-                        0 - 0
-                    </span>
-
-                    <span id="timer-display">
-                        00:00
-                    </span>
-
-                </div>
-
-                <div id="player-bottom"></div>
-
-            </header>
-
-            <main id="game-layout">
-
-                <div id="board-container">
-
-                    <div id="board">
-                        <!-- Tahta boardUI.js tarafından üretilecek -->
                     </div>
 
-                </div>
+                </section>
 
-            </main>
+                <!-- SETTINGS PANEL -->
+                <section
+                    id="settings-panel"
+                    class="panel panel--closed settings-panel"
+                >
 
-            <footer id="game-controls">
+                    <h2>
+                        Ayarlar
+                    </h2>
 
-                <button id="roll-dice-btn">
-                    Zar At
-                </button>
+                    <div id="settings-content"></div>
 
-                <button id="undo-btn">
-                    Geri Al
-                </button>
+                </section>
 
-                <button id="finish-turn-btn">
-                    Hamleyi Bitir
-                </button>
+            </aside>
 
-                <button id="menu-btn">
-                    ☰
-                </button>
+        </main>
 
-            </footer>
+        <!-- BOTTOM BAR -->
+        <footer
+            id="bottom-bar"
+            class="bottom-bar"
+        >
 
-        </section>
-
-        <!-- Sohbet Paneli -->
-        <aside id="chat-panel" class="hidden">
-
-            <div id="chat-messages"></div>
-
-            <input
-                type="text"
-                id="chat-input"
-                placeholder="Mesaj yaz...">
-
-            <button id="send-chat-btn">
-                Gönder
+            <button
+                id="roll-dice-button"
+                class="btn btn--primary bottom-bar__button"
+                aria-label="Zar At"
+            >
+                Zar At
             </button>
 
-        </aside>
+            <button
+                id="undo-button"
+                class="btn btn--secondary bottom-bar__button"
+                aria-label="Geri Al"
+            >
+                Geri Al
+            </button>
 
-        <!-- Hamle Geçmişi -->
-        <aside id="history-panel" class="hidden">
+            <button
+                id="end-turn-button"
+                class="btn btn--success bottom-bar__button"
+                aria-label="Hamleyi Bitir"
+            >
+                Hamleyi Bitir
+            </button>
 
-            <h3>Hamle Geçmişi</h3>
+        </footer>
 
-            <div id="history-list"></div>
-
-        </aside>
+        <!-- MOBILE MENU -->
+        <button
+            id="mobile-menu-button"
+            class="mobile-menu mobile-menu--closed"
+            aria-label="Menüyü Aç"
+        >
+            ⋮
+        </button>
 
     </div>
 
-    <!-- JavaScript -->
-    <script type="module" src="js/app.js"></script>
+    <!-- DIALOG LAYER -->
+    <div
+        id="dialog-layer"
+        aria-live="polite"
+    ></div>
+
+    <!-- NOTIFICATION LAYER -->
+    <div
+        id="notification-layer"
+        aria-live="polite"
+    ></div>
+
+    <!-- APP ENTRY -->
+    <script
+        type="module"
+        src="./js/app.js"
+    ></script>
 
 </body>
 </html>
-
