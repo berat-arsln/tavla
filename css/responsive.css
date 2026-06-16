@@ -1,329 +1,172 @@
-/* =========================
-   LARGE DESKTOP
-========================= */
+/* css/responsive.css */
 
-@media (min-width: 1400px) {
-
-    #board {
-
-        max-width: 1300px;
-
+/* Tablet ve altı */
+@media (max-width: 1024px) {
+    .layout {
+        flex-direction: column;
     }
 
+    .layout__sidebar {
+        width: 100%;
+    }
+
+    .players-area {
+        grid-template-columns: 1fr;
+    }
+
+    #board-render-area {
+        min-height: 440px;
+    }
+
+    .checker {
+        width: 38px;
+        height: 38px;
+    }
 }
 
-/* =========================
-   DESKTOP
-========================= */
-
-@media (min-width: 1024px) {
-
-    #game-layout {
-
-        padding: 20px;
-
-    }
-
-}
-
-/* =========================
-   TABLET
-========================= */
-
-@media (max-width: 1023px) {
-
-    #board {
-
-        max-width: 100%;
-
-    }
-
-    #game-controls {
-
-        gap: 8px;
-
-    }
-
-    #game-controls button {
-
-        min-width: 100px;
-
-    }
-
-}
-
-/* =========================
-   TABLET PORTRAIT
-========================= */
-
-@media (max-width: 900px) {
-
-    #player-top,
-    #player-bottom {
-
-        min-width: 90px;
-
-        font-size: 0.9rem;
-
-    }
-
-    #score-display {
-
-        font-size: 1.1rem;
-
-    }
-
-}
-
-/* =========================
-   PHONE LANDSCAPE
-========================= */
-
-@media (max-width: 900px)
-and (orientation: landscape) {
-
-    #game-screen {
-
-        overflow: hidden;
-
-    }
-
-    #game-header {
-
-        padding: 8px;
-
-    }
-
-    #board {
-
-        max-height: 70vh;
-
-    }
-
-    #game-controls {
-
-        padding: 8px;
-
-    }
-
-    #game-controls button {
-
-        min-width: 90px;
-
-        padding: 10px;
-
-        font-size: 0.85rem;
-
-    }
-
-}
-
-/* =========================
-   PHONE PORTRAIT
-========================= */
-
+/* Telefon */
 @media (max-width: 768px) {
+    .top-bar {
+        padding: 0 0.75rem;
+    }
 
-    #game-header {
-
+    .bottom-bar {
         flex-wrap: wrap;
-
     }
 
-    #player-top,
-    #player-bottom {
+    .layout {
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
 
+    .layout__sidebar {
+        display: none;
+    }
+
+    #board-render-area {
+        grid-template-columns: repeat(6, 1fr);
+
+        min-height: auto;
+
+        padding: 0.75rem;
+    }
+
+    .board-point {
+        min-height: 160px;
+    }
+
+    .checker {
+        width: 34px;
+        height: 34px;
+    }
+
+    .game-actions {
+        flex-direction: column;
+    }
+
+    .game-actions .btn {
         width: 100%;
-
     }
 
-    #game-info {
-
-        width: 100%;
-
+    .scoreboard {
+        flex-wrap: wrap;
     }
 
-    #board-container {
-
-        padding: 4px;
-
+    .timer-display {
+        min-width: 100px;
     }
 
-    #board {
-
-        width: 100%;
-
-        max-width: 100%;
-
+    .history-panel,
+    .chat-panel,
+    .settings-panel {
+        display: none;
     }
-
-    #game-controls {
-
-        display: grid;
-
-        grid-template-columns:
-            repeat(2, 1fr);
-
-        gap: 8px;
-
-    }
-
-    #game-controls button {
-
-        width: 100%;
-
-    }
-
 }
 
-/* =========================
-   MOBILE CHAT
-========================= */
-
-@media (max-width: 768px) {
-
-    #chat-panel {
-
-        position: fixed;
-
-        inset: 0;
-
-        width: 100%;
-
-        height: 100%;
-
-        border-radius: 0;
-
-        z-index: 9999;
-
-    }
-
-    #history-panel {
-
-        position: fixed;
-
-        inset: 0;
-
-        width: 100%;
-
-        height: 100%;
-
-        border-radius: 0;
-
-        z-index: 9999;
-
-    }
-
-}
-
-/* =========================
-   SMALL PHONES
-========================= */
-
-@media (max-width: 600px) {
-
-    .menu-buttons {
-
-        margin-top: 20px;
-
-    }
-
-    .menu-buttons button {
-
-        padding: 14px;
-
-        font-size: 0.95rem;
-
-    }
-
-    #game-controls {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-    #score-display {
-
-        font-size: 1rem;
-
-    }
-
-}
-
-/* =========================
-   VERY SMALL PHONES
-========================= */
-
-@media (max-width: 420px) {
-
-    body {
-
+/* Küçük Telefonlar */
+@media (max-width: 480px) {
+    html {
         font-size: 14px;
-
     }
 
-    .screen {
-
-        padding: 10px;
-
+    .layout {
+        padding: 0.5rem;
     }
 
-    #player-top,
-    #player-bottom {
-
-        font-size: 0.8rem;
-
-        padding: 6px;
-
+    #board-render-area {
+        gap: 0.25rem;
+        padding: 0.5rem;
     }
 
-    #timer-display {
-
-        font-size: 0.85rem;
-
+    .board-point {
+        min-height: 120px;
+        padding: 0.25rem;
     }
 
-    #game-controls button {
-
-        padding: 10px;
-
-        font-size: 0.8rem;
-
+    .checker {
+        width: 28px;
+        height: 28px;
     }
 
+    .player-card {
+        padding: 0.75rem;
+    }
+
+    .timer-display {
+        min-width: 80px;
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: 0.65rem 0.75rem;
+    }
 }
 
-/* =========================
-   TALL PHONES
-========================= */
-
-@media (max-height: 700px) {
-
-    #game-header {
-
-        padding: 6px;
-
+/* Telefon Yatay */
+@media (max-width: 932px) and (orientation: landscape) {
+    .layout {
+        flex-direction: row;
     }
 
-    #game-controls {
-
-        padding: 6px;
-
+    .layout__sidebar {
+        display: flex;
+        width: 260px;
     }
 
+    #board-render-area {
+        min-height: 360px;
+    }
+
+    .board-point {
+        min-height: 140px;
+    }
 }
 
-/* =========================
-   ULTRA WIDE
-========================= */
-
-@media (min-width: 1800px) {
-
-    #board {
-
-        max-width: 1500px;
-
+/* Tablet Yatay */
+@media (min-width: 769px) and (max-width: 1280px) and (orientation: landscape) {
+    .layout__sidebar {
+        width: 280px;
     }
 
+    #board-render-area {
+        min-height: 480px;
+    }
+}
+
+/* Büyük Ekranlar */
+@media (min-width: 1440px) {
+    .layout {
+        max-width: 1600px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    #board-render-area {
+        min-height: 650px;
+    }
+
+    .checker {
+        width: 48px;
+        height: 48px;
+    }
 }
