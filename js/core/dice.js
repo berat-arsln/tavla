@@ -1,253 +1,73 @@
 // js/core/dice.js
 
-export class DiceManager {
-
+export class Dice {
     constructor() {
-
-        this.values = [];
-
-        this.usedDice = [];
-
+        this.lastRoll = null;
+        this.lastStartRoll = null;
     }
-
-    // 1-6 arası tek zar
-
-    randomDie() {
-
-        return Math.floor(
-            Math.random() * 6
-        ) + 1;
-
-    }
-
-    // Normal tur zarı
 
     roll() {
+        const dieOne = this.#generateDieValue();
+        const dieTwo = this.#generateDieValue();
 
-        const die1 =
-            this.randomDie();
-
-        const die2 =
-            this.randomDie();
-
-        if (die1 === die2) {
-
-            this.values = [
-                die1,
-                die1,
-                die1,
-                die1
-            ];
-
-        } else {
-
-            this.values = [
-                die1,
-                die2
-            ];
-
-        }
-
-        this.usedDice = [];
-
-        return this.getDice();
-
-    }
-
-    // Oyuna başlama zarı
-
-    rollStartingDice() {
-
-        let white =
-            this.randomDie();
-
-        let black =
-            this.randomDie();
-
-        while (white === black) {
-
-            white =
-                this.randomDie();
-
-            black =
-                this.randomDie();
-
-        }
-
-        return {
-
-            white,
-            black,
-
-            starter:
-                white > black
-                    ? "white"
-                    : "black"
-
+        this.lastRoll = {
+            dieOne,
+            dieTwo,
+            values: this.#buildMoveValues(dieOne, dieTwo),
+            isDouble: dieOne === dieTwo
         };
 
+        return structuredClone(this.lastRoll);
     }
 
-    getDice() {
+    rollStartDice() {
+        let playerOne;
+        let playerTwo;
 
-        return [...this.values];
+        do {
+            playerOne = this.#generateDieValue();
+            playerTwo = this.#generateDieValue();
+        } while (playerOne === playerTwo);
 
+        const starter =
+            playerOne > playerTwo
+                ? "white"
+                : "black";
+
+        this.lastStartRoll = {
+            playerOne,
+            playerTwo,
+            starter
+        };
+
+        return structuredClone(this.lastStartRoll);
     }
 
-    getUnusedDice() {
-
-        return this.values.filter(
-            (_, index) =>
-                !this.usedDice.includes(
-                    index
-                )
-        );
-
-    }
-
-    useDie(index) {
-
-        if (
-            index < 0 ||
-            index >= this.values.length
-        ) {
+    isDouble() {
+        if (!this.lastRoll) {
             return false;
         }
 
-        if (
-            this.usedDice.includes(index)
-        ) {
-            return false;
+        return this.lastRoll.isDouble;
+    }
+
+    #generateDieValue() {
+        return Math.floor(Math.random() * 6) + 1;
+    }
+
+    #buildMoveValues(dieOne, dieTwo) {
+        if (dieOne === dieTwo) {
+            return [
+                dieOne,
+                dieOne,
+                dieOne,
+                dieOne
+            ];
         }
-
-        this.usedDice.push(index);
-
-        return true;
-
-    }
-
-    resetUsage() {
-
-        this.usedDice = [];
-
-    }
-
-    isDieUsed(index) {
-
-        return this.usedDice.includes(
-            index
-        );
-
-    }
-
-    getUsedDice() {
 
         return [
-            ...this.usedDice
+            dieOne,
+            dieTwo
         ];
-
     }
-
-    areAllDiceUsed() {
-
-        return (
-            this.usedDice.length ===
-            this.values.length
-        );
-
-    }
-
-    remainingMoves() {
-
-        return this.values.length -
-            this.usedDice.length;
-
-    }
-
-    getRemainingDiceValues() {
-
-        return this.values.filter(
-            (_, index) =>
-                !this.usedDice.includes(
-                    index
-                )
-        );
-
-    }
-
-    // Undo için
-
-    saveState() {
-
-        return {
-
-            values: [
-                ...this.values
-            ],
-
-            usedDice: [
-                ...this.usedDice
-            ]
-
-        };
-
-    }
-
-    restoreState(state) {
-
-        this.values = [
-            ...state.values
-        ];
-
-        this.usedDice = [
-            ...state.usedDice
-        ];
-
-    }
-
-    clear() {
-
-        this.values = [];
-
-        this.usedDice = [];
-
-    }
-
-    // Toplam zar değeri
-
-    getTotalValue() {
-
-        return this.getRemainingDiceValues()
-            .reduce(
-                (sum, value) =>
-                    sum + value,
-                0
-            );
-
-    }
-
-    // Örnek:
-    // 6-3 geldiğinde
-    // 9 ilerleme yapılabiliyor mu?
-
-    canCombineDice() {
-
-        return (
-            this.getRemainingDiceValues()
-                .length > 1
-        );
-
-    }
-
-    getCombinedValue() {
-
-        return this.getRemainingDiceValues()
-            .reduce(
-                (sum, value) =>
-                    sum + value,
-                0
-            );
-
-    }
-
 }
