@@ -9,218 +9,172 @@ export class BoardUI {
                 boardElementId
             );
 
+        this.selectedPoint = null;
+
+        this.highlightedPoints = [];
+
         this.pointClickHandler = null;
 
     }
 
     setPointClickHandler(handler) {
 
-        this.pointClickHandler = handler;
+        this.pointClickHandler =
+            handler;
 
     }
 
     createBoard() {
 
-        if (!this.boardElement) return;
+        if (!this.boardElement) {
+            return;
+        }
 
         this.boardElement.innerHTML = "";
 
-        const boardWrapper =
+        const wrapper =
             document.createElement("div");
 
-        boardWrapper.className =
-            "backgammon-board";
+        wrapper.className =
+            "board-wrapper";
 
         /*
-         * ÜST SOL
-         * 13-18
+         * ÜST SATIR
+         * 13-24
          */
 
-        const topLeft =
-            this.createQuadrant(
-                [13,14,15,16,17,18],
-                "top"
-            );
-
-        /*
-         * ÜST SAĞ
-         * 19-24
-         */
-
-        const topRight =
-            this.createQuadrant(
-                [19,20,21,22,23,24],
-                "top"
-            );
-
-        /*
-         * ALT SOL
-         * 12-7
-         */
-
-        const bottomLeft =
-            this.createQuadrant(
-                [12,11,10,9,8,7],
-                "bottom"
-            );
-
-        /*
-         * ALT SAĞ
-         * 6-1
-         */
-
-        const bottomRight =
-            this.createQuadrant(
-                [6,5,4,3,2,1],
-                "bottom"
-            );
-
-        const centerBar =
+        const topRow =
             document.createElement("div");
 
-        centerBar.className =
-            "center-bar";
+        topRow.className =
+            "board-row top-row";
 
-        const upperRow =
-            document.createElement("div");
+        const topPoints = [
+            13,14,15,16,17,18,
+            19,20,21,22,23,24
+        ];
 
-        upperRow.className =
-            "board-row";
+        topPoints.forEach(point => {
 
-        upperRow.appendChild(
-            topLeft
-        );
-
-        upperRow.appendChild(
-            centerBar.cloneNode()
-        );
-
-        upperRow.appendChild(
-            topRight
-        );
-
-        const lowerRow =
-            document.createElement("div");
-
-        lowerRow.className =
-            "board-row";
-
-        lowerRow.appendChild(
-            bottomLeft
-        );
-
-        lowerRow.appendChild(
-            centerBar
-        );
-
-        lowerRow.appendChild(
-            bottomRight
-        );
-
-        boardWrapper.appendChild(
-            upperRow
-        );
-
-        boardWrapper.appendChild(
-            lowerRow
-        );
-
-        /*
-         * TOPLAMA ALANI
-         */
-
-        const bearOff =
-            document.createElement("div");
-
-        bearOff.className =
-            "bearoff-zone";
-
-        boardWrapper.appendChild(
-            bearOff
-        );
-
-        this.boardElement.appendChild(
-            boardWrapper
-        );
-
-    }
-
-    createQuadrant(points, side) {
-
-        const quadrant =
-            document.createElement("div");
-
-        quadrant.className =
-            "quadrant";
-
-        points.forEach(point => {
-
-            const pointElement =
-                document.createElement("div");
-
-            pointElement.className =
-                `point ${side}`;
-
-            pointElement.dataset.point =
-                point;
-
-            const number =
-                document.createElement("span");
-
-            number.className =
-                "point-number";
-
-            number.textContent =
-                point;
-
-            const checkerContainer =
-                document.createElement("div");
-
-            checkerContainer.className =
-                "checker-container";
-
-            pointElement.appendChild(
-                number
-            );
-
-            pointElement.appendChild(
-                checkerContainer
-            );
-
-            pointElement.addEventListener(
-                "click",
-                () => {
-
-                    if (
-                        this.pointClickHandler
-                    ) {
-
-                        this.pointClickHandler(
-                            point
-                        );
-
-                    }
-
-                }
-            );
-
-            quadrant.appendChild(
-                pointElement
+            topRow.appendChild(
+                this.createPoint(
+                    point,
+                    "top"
+                )
             );
 
         });
 
-        return quadrant;
+        /*
+         * ALT SATIR
+         * 12-1
+         */
+
+        const bottomRow =
+            document.createElement("div");
+
+        bottomRow.className =
+            "board-row bottom-row";
+
+        const bottomPoints = [
+            12,11,10,9,8,7,
+            6,5,4,3,2,1
+        ];
+
+        bottomPoints.forEach(point => {
+
+            bottomRow.appendChild(
+                this.createPoint(
+                    point,
+                    "bottom"
+                )
+            );
+
+        });
+
+        wrapper.appendChild(
+            topRow
+        );
+
+        wrapper.appendChild(
+            bottomRow
+        );
+
+        this.boardElement.appendChild(
+            wrapper
+        );
 
     }
 
-    renderBoard(boardState) {
+    createPoint(
+        pointNumber,
+        side
+    ) {
 
-        if (!boardState) return;
+        const point =
+            document.createElement("div");
+
+        point.className =
+            `board-point ${side}`;
+
+        point.dataset.point =
+            pointNumber;
+
+        const number =
+            document.createElement("div");
+
+        number.className =
+            "point-number";
+
+        number.textContent =
+            pointNumber;
+
+        const piecesContainer =
+            document.createElement("div");
+
+        piecesContainer.className =
+            "point-pieces";
+
+        point.appendChild(number);
+
+        point.appendChild(
+            piecesContainer
+        );
+
+        point.addEventListener(
+            "click",
+            () => {
+
+                if (
+                    this.pointClickHandler
+                ) {
+
+                    this.pointClickHandler(
+                        pointNumber
+                    );
+
+                }
+
+            }
+        );
+
+        return point;
+
+    }
+
+    renderBoard(board) {
+
+        if (!board) {
+            return;
+        }
+
+        /*
+         * Önce temizle
+         */
 
         document
             .querySelectorAll(
-                ".checker-container"
+                ".point-pieces"
             )
             .forEach(container => {
 
@@ -228,40 +182,94 @@ export class BoardUI {
 
             });
 
-        boardState.points.forEach(
-            point => {
+        /*
+         * 1-24 dolaş
+         */
 
-                const pointElement =
-                    document.querySelector(
-                        `[data-point="${point.point}"] .checker-container`
-                    );
+        for (
+            let point = 1;
+            point <= 24;
+            point++
+        ) {
 
-                if (
-                    !pointElement
-                ) return;
+            const pointElement =
+                document.querySelector(
+                    `[data-point="${point}"] .point-pieces`
+                );
 
-                for (
-                    let i = 0;
-                    i < point.count;
-                    i++
-                ) {
-
-                    const checker =
-                        document.createElement(
-                            "div"
-                        );
-
-                    checker.className =
-                        `checker ${point.player}`;
-
-                    pointElement.appendChild(
-                        checker
-                    );
-
-                }
-
+            if (!pointElement) {
+                continue;
             }
+
+            const pieces =
+                board.points[point];
+
+            pieces.forEach(piece => {
+
+                const checker =
+                    document.createElement(
+                        "div"
+                    );
+
+                checker.className =
+                    `piece ${piece.color}`;
+
+                pointElement.appendChild(
+                    checker
+                );
+
+            });
+
+        }
+
+    }
+
+    updateBoard(board) {
+
+        this.renderBoard(
+            board
         );
+
+    }
+
+    selectPoint(pointNumber) {
+
+        this.clearSelection();
+
+        const point =
+            document.querySelector(
+                `[data-point="${pointNumber}"]`
+            );
+
+        if (!point) {
+            return;
+        }
+
+        point.classList.add(
+            "selected"
+        );
+
+        this.selectedPoint =
+            pointNumber;
+
+    }
+
+    clearSelection() {
+
+        document
+            .querySelectorAll(
+                ".selected"
+            )
+            .forEach(element => {
+
+                element.classList.remove(
+                    "selected"
+                );
+
+            });
+
+        this.selectedPoint =
+            null;
 
     }
 
@@ -276,13 +284,16 @@ export class BoardUI {
                     `[data-point="${point}"]`
                 );
 
-            if (element) {
-
-                element.classList.add(
-                    "possible-move"
-                );
-
+            if (!element) {
+                return;
             }
+
+            element.classList.add(
+                "possible-move"
+            );
+
+            this.highlightedPoints
+                .push(element);
 
         });
 
@@ -290,10 +301,7 @@ export class BoardUI {
 
     clearHighlights() {
 
-        document
-            .querySelectorAll(
-                ".possible-move"
-            )
+        this.highlightedPoints
             .forEach(element => {
 
                 element.classList.remove(
@@ -301,6 +309,9 @@ export class BoardUI {
                 );
 
             });
+
+        this.highlightedPoints =
+            [];
 
     }
 
