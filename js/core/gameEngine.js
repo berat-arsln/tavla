@@ -1,366 +1,239 @@
 // js/core/gameEngine.js
 
-import { MoveValidator }
-from "./moveValidator.js";
+import { Board } from "./board.js";
+import { Dice } from "./dice.js";
+import { MoveValidator } from "./moveValidator.js";
+import { History } from "./history.js";
+import { UndoManager } from "./undo.js";
 
 export class GameEngine {
+    constructor() {
+        this.board = new Board();
+        this.dice = new Dice();
+        this.moveValidator = new MoveValidator();
+        this.history = new History();
+        this.undoManager = new UndoManager();
 
-    constructor(options = {}) {
+        this.gameState = null;
+        this.startRollResult = null;
+        this.currentDice = null;
+        this.winner = null;
+    }
 
-        this.variant =
-            options.variant ||
-            "turkish";
+    startMatch() {
+        this.board.initialize();
 
-        this.board = null;
+        this.history.clear();
+        this.undoManager.clear();
 
-        this.currentPlayer =
-            "white";
-
-        this.status =
-            "waiting";
-
-        this.gameId =
-            null;
-
-        this.players = [];
-
-        this.moveValidator =
-            new MoveValidator();
-
-        this.diceValues = [];
-
-        this.selectedPoint =
-            null;
-
+        this.startRollResult = null;
+        this.currentDice = null;
         this.winner = null;
 
-    }
+        this.gameState = {
+            variant: "turkish",
 
-    /* =========================
-       BOARD
-    ========================= */
+            currentPlayer: null,
 
-    setBoard(board) {
+            turnNumber: 0,
 
-        this.board = board;
+            board: this.board.getState(),
 
-    }
+            dice: null,
 
-    getBoard() {
+            gameOver: false,
 
-        return this.board;
-
-    }
-
-    /* =========================
-       GAME
-    ========================= */
-
-    startGame() {
-
-        this.status =
-            "playing";
-
-        this.currentPlayer =
-            "white";
-
-        this.winner =
-            null;
-
-    }
-
-    endGame(winnerColor) {
-
-        this.status =
-            "finished";
-
-        this.winner =
-            winnerColor;
-
-    }
-
-    /* =========================
-       PLAYER
-    ========================= */
-
-    getCurrentPlayer() {
-
-        return this.currentPlayer;
-
-    }
-
-    switchPlayer() {
-
-        this.currentPlayer =
-
-            this.currentPlayer ===
-            "white"
-
-                ? "black"
-
-                : "white";
-
-        this.selectedPoint =
-            null;
-
-        this.diceValues = [];
-
-    }
-
-    /* =========================
-       DICE
-    ========================= */
-
-    setDiceValues(values) {
-
-        this.diceValues =
-            [...values];
-
-    }
-
-    getDiceValues() {
-
-        return this.diceValues;
-
-    }
-
-    consumeDice(value) {
-
-        const index =
-            this.diceValues.indexOf(
-                value
-            );
-
-        if (
-            index !== -1
-        ) {
-
-            this.diceValues.splice(
-                index,
-                1
-            );
-
-        }
-
-    }
-
-    /* =========================
-       SELECTION
-    ========================= */
-
-    selectPoint(point) {
-
-        this.selectedPoint =
-            point;
-
-    }
-
-    clearSelection() {
-
-        this.selectedPoint =
-            null;
-
-    }
-
-    getSelectedPoint() {
-
-        return this.selectedPoint;
-
-    }
-
-    /* =========================
-       MOVE
-    ========================= */
-
-    movePiece(
-        fromPoint,
-        toPoint
-    ) {
-
-        if (
-            !this.board
-        ) {
-            return false;
-        }
-
-        const distance =
-            Math.abs(
-                toPoint -
-                fromPoint
-            );
-
-        if (
-            !this.diceValues.includes(
-                distance
-            )
-        ) {
-            return false;
-        }
-
-        const isValid =
-            this.moveValidator
-                .isValidMove(
-
-                    this.board,
-
-                    fromPoint,
-
-                    toPoint,
-
-                    this.currentPlayer
-
-                );
-
-        if (
-            !isValid
-        ) {
-            return false;
-        }
-
-        const targetStack =
-            this.board.points[
-                toPoint
-            ];
-
-        /*
-         * Rakip tek taş
-         */
-
-        if (
-
-            targetStack.length === 1 &&
-
-            targetStack[0].color !==
-            this.currentPlayer
-
-        ) {
-
-            const capturedPiece =
-                targetStack.pop();
-
-            this.board.bar[
-                capturedPiece.color
-            ].push(
-                capturedPiece
-            );
-
-        }
-
-        const movingPiece =
-            this.board.points[
-                fromPoint
-            ].pop();
-
-        this.board.points[
-            toPoint
-        ].push(
-            movingPiece
-        );
-
-        this.consumeDice(
-            distance
-        );
-
-        return true;
-
-    }
-
-    /* =========================
-       LEGAL MOVES
-    ========================= */
-
-    getLegalMoves(
-        point
-    ) {
-
-        const result = [];
-
-        this.diceValues
-            .forEach(dice => {
-
-                const moves =
-                    this.moveValidator
-                        .getLegalMoves(
-
-                            this.board,
-
-                            point,
-
-                            dice,
-
-                            this.currentPlayer
-
-                        );
-
-                result.push(
-                    ...moves
-                );
-
-            });
-
-        return result;
-
-    }
-
-    canCurrentPlayerMove() {
-
-        return this.moveValidator
-            .canPlayerMove(
-
-                this.board,
-
-                this.diceValues,
-
-                this.currentPlayer
-
-            );
-
-    }
-
-    /* =========================
-       TURN
-    ========================= */
-
-    finishTurn() {
-
-        this.switchPlayer();
-
-    }
-
-    /* =========================
-       STATE
-    ========================= */
-
-    getState() {
-
-        return {
-
-            gameId:
-                this.gameId,
-
-            variant:
-                this.variant,
-
-            status:
-                this.status,
-
-            players:
-                this.players,
-
-            currentPlayer:
-                this.currentPlayer,
-
-            winner:
-                this.winner,
-
-            diceValues:
-                this.diceValues,
-
-            selectedPoint:
-                this.selectedPoint
-
+            winner: null
         };
 
+        return this.getGameState();
     }
 
+    rollStartDice() {
+        this.startRollResult =
+            this.dice.rollStartDice();
+
+        this.gameState.currentPlayer =
+            this.startRollResult.starter;
+
+        return structuredClone(
+            this.startRollResult
+        );
+    }
+
+    rollDice() {
+        this.currentDice =
+            this.dice.roll();
+
+        this.gameState.dice =
+            structuredClone(this.currentDice);
+
+        return structuredClone(
+            this.currentDice
+        );
+    }
+
+    getGameState() {
+        return structuredClone(
+            this.gameState
+        );
+    }
+
+    getValidMoves(fromPosition) {
+        if (
+            !this.gameState ||
+            !this.currentDice
+        ) {
+            return [];
+        }
+
+        return this.moveValidator.getValidMoves(
+            this.gameState.board,
+            fromPosition,
+            this.gameState.currentPlayer,
+            this.currentDice.values
+        );
+    }
+
+    makeMove(fromPosition, toPosition) {
+        if (
+            !this.gameState ||
+            this.gameState.gameOver
+        ) {
+            return false;
+        }
+
+        const move = {
+            from: fromPosition,
+            to: toPosition
+        };
+
+        const isValid =
+            this.moveValidator.validateMove(
+                this.gameState.board,
+                move,
+                this.gameState.currentPlayer
+            );
+
+        if (!isValid) {
+            return false;
+        }
+
+        this.undoManager.pushSnapshot(
+            this.gameState
+        );
+
+        this.board.state =
+            structuredClone(
+                this.gameState.board
+            );
+
+        this.board.moveChecker(
+            fromPosition,
+            toPosition
+        );
+
+        this.gameState.board =
+            this.board.getState();
+
+        return true;
+    }
+
+    undoMove() {
+        const snapshot =
+            this.undoManager.popSnapshot();
+
+        if (!snapshot) {
+            return false;
+        }
+
+        this.gameState =
+            structuredClone(snapshot);
+
+        this.board.state =
+            structuredClone(
+                this.gameState.board
+            );
+
+        return true;
+    }
+
+    endTurn() {
+        if (
+            !this.gameState ||
+            this.gameState.gameOver
+        ) {
+            return;
+        }
+
+        this.history.addTurn({
+            turnNumber:
+                this.gameState.turnNumber + 1,
+
+            player:
+                this.gameState.currentPlayer,
+
+            dice:
+                structuredClone(
+                    this.currentDice
+                ),
+
+            board:
+                structuredClone(
+                    this.gameState.board
+                )
+        });
+
+        this.undoManager.clear();
+
+        this.gameState.turnNumber += 1;
+
+        this.gameState.currentPlayer =
+            this.gameState.currentPlayer ===
+            "white"
+                ? "black"
+                : "white";
+
+        this.currentDice = null;
+
+        this.gameState.dice = null;
+
+        const gameResult =
+            this.moveValidator.checkGameEnd(
+                this.gameState.board
+            );
+
+        if (gameResult.isGameOver) {
+            this.gameState.gameOver = true;
+            this.gameState.winner =
+                gameResult.winner;
+
+            this.winner =
+                gameResult.winner;
+        }
+    }
+
+    canUndo() {
+        return this.undoManager.canUndo();
+    }
+
+    isGameOver() {
+        return (
+            this.gameState?.gameOver === true
+        );
+    }
+
+    getWinner() {
+        return this.winner;
+    }
+
+    destroy() {
+        this.history.clear();
+        this.undoManager.clear();
+
+        this.gameState = null;
+        this.startRollResult = null;
+        this.currentDice = null;
+        this.winner = null;
+    }
 }
