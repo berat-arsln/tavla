@@ -9,11 +9,14 @@ export class BoardUI {
                 boardElementId
             );
 
-        this.selectedPoint = null;
+        this.pointClickHandler =
+            null;
 
-        this.highlightedPoints = [];
+        this.highlightedPoints =
+            [];
 
-        this.pointClickHandler = null;
+        this.selectedPoint =
+            null;
 
     }
 
@@ -32,77 +35,161 @@ export class BoardUI {
 
         this.boardElement.innerHTML = "";
 
-        const wrapper =
+        const board =
             document.createElement("div");
 
-        wrapper.className =
-            "board-wrapper";
+        board.className =
+            "backgammon-board";
 
         /*
          * ÜST SATIR
-         * 13-24
          */
 
         const topRow =
             document.createElement("div");
 
         topRow.className =
-            "board-row top-row";
-
-        const topPoints = [
-            13,14,15,16,17,18,
-            19,20,21,22,23,24
-        ];
-
-        topPoints.forEach(point => {
-
-            topRow.appendChild(
-                this.createPoint(
-                    point,
-                    "top"
-                )
-            );
-
-        });
+            "board-row";
 
         /*
          * ALT SATIR
-         * 12-1
          */
 
         const bottomRow =
             document.createElement("div");
 
         bottomRow.className =
-            "board-row bottom-row";
+            "board-row";
 
-        const bottomPoints = [
-            12,11,10,9,8,7,
-            6,5,4,3,2,1
-        ];
+        /*
+         * ÜST SOL
+         * 13-18
+         */
 
-        bottomPoints.forEach(point => {
+        topRow.appendChild(
 
-            bottomRow.appendChild(
+            this.createQuadrant(
+                [13,14,15,16,17,18],
+                "top"
+            )
+
+        );
+
+        /*
+         * ORTA BAR
+         */
+
+        topRow.appendChild(
+            this.createCenterBar()
+        );
+
+        /*
+         * ÜST SAĞ
+         * 19-24
+         */
+
+        topRow.appendChild(
+
+            this.createQuadrant(
+                [19,20,21,22,23,24],
+                "top"
+            )
+
+        );
+
+        /*
+         * ALT SOL
+         * 12-7
+         */
+
+        bottomRow.appendChild(
+
+            this.createQuadrant(
+                [12,11,10,9,8,7],
+                "bottom"
+            )
+
+        );
+
+        bottomRow.appendChild(
+            this.createCenterBar()
+        );
+
+        /*
+         * ALT SAĞ
+         * 6-1
+         */
+
+        bottomRow.appendChild(
+
+            this.createQuadrant(
+                [6,5,4,3,2,1],
+                "bottom"
+            )
+
+        );
+
+        board.appendChild(
+            topRow
+        );
+
+        board.appendChild(
+            bottomRow
+        );
+
+        const bearOff =
+            document.createElement("div");
+
+        bearOff.className =
+            "bearoff-zone";
+
+        board.appendChild(
+            bearOff
+        );
+
+        this.boardElement.appendChild(
+            board
+        );
+
+    }
+
+    createCenterBar() {
+
+        const bar =
+            document.createElement("div");
+
+        bar.className =
+            "center-bar";
+
+        return bar;
+
+    }
+
+    createQuadrant(
+        points,
+        side
+    ) {
+
+        const quadrant =
+            document.createElement("div");
+
+        quadrant.className =
+            "quadrant";
+
+        points.forEach(point => {
+
+            quadrant.appendChild(
+
                 this.createPoint(
                     point,
-                    "bottom"
+                    side
                 )
+
             );
 
         });
 
-        wrapper.appendChild(
-            topRow
-        );
-
-        wrapper.appendChild(
-            bottomRow
-        );
-
-        this.boardElement.appendChild(
-            wrapper
-        );
+        return quadrant;
 
     }
 
@@ -115,7 +202,7 @@ export class BoardUI {
             document.createElement("div");
 
         point.className =
-            `board-point ${side}`;
+            `point ${side}`;
 
         point.dataset.point =
             pointNumber;
@@ -129,16 +216,16 @@ export class BoardUI {
         number.textContent =
             pointNumber;
 
-        const piecesContainer =
+        const container =
             document.createElement("div");
 
-        piecesContainer.className =
-            "point-pieces";
+        container.className =
+            "checker-container";
 
         point.appendChild(number);
 
         point.appendChild(
-            piecesContainer
+            container
         );
 
         point.addEventListener(
@@ -168,23 +255,16 @@ export class BoardUI {
             return;
         }
 
-        /*
-         * Önce temizle
-         */
-
         document
             .querySelectorAll(
-                ".point-pieces"
+                ".checker-container"
             )
             .forEach(container => {
 
-                container.innerHTML = "";
+                container.innerHTML =
+                    "";
 
             });
-
-        /*
-         * 1-24 dolaş
-         */
 
         for (
             let point = 1;
@@ -192,12 +272,16 @@ export class BoardUI {
             point++
         ) {
 
-            const pointElement =
+            const pointContainer =
                 document.querySelector(
-                    `[data-point="${point}"] .point-pieces`
+
+                    `[data-point="${point}"] .checker-container`
+
                 );
 
-            if (!pointElement) {
+            if (
+                !pointContainer
+            ) {
                 continue;
             }
 
@@ -212,9 +296,9 @@ export class BoardUI {
                     );
 
                 checker.className =
-                    `piece ${piece.color}`;
+                    `checker ${piece.color}`;
 
-                pointElement.appendChild(
+                pointContainer.appendChild(
                     checker
                 );
 
@@ -238,7 +322,9 @@ export class BoardUI {
 
         const point =
             document.querySelector(
+
                 `[data-point="${pointNumber}"]`
+
             );
 
         if (!point) {
@@ -281,7 +367,9 @@ export class BoardUI {
 
             const element =
                 document.querySelector(
+
                     `[data-point="${point}"]`
+
                 );
 
             if (!element) {
@@ -292,8 +380,9 @@ export class BoardUI {
                 "possible-move"
             );
 
-            this.highlightedPoints
-                .push(element);
+            this.highlightedPoints.push(
+                element
+            );
 
         });
 
