@@ -1,275 +1,172 @@
 // js/core/moveValidator.js
 
 export class MoveValidator {
-
     constructor() {
-
         this.variant = "turkish";
-
     }
 
-    isValidMove(
-        board,
-        fromPoint,
-        toPoint,
-        playerColor
-    ) {
-
-        if (
-            fromPoint < 1 ||
-            fromPoint > 24
-        ) {
-            return false;
-        }
-
-        if (
-            toPoint < 1 ||
-            toPoint > 24
-        ) {
-            return false;
-        }
-
-        const fromStack =
-            board.points[fromPoint];
-
-        const targetStack =
-            board.points[toPoint];
-
-        if (
-            !fromStack ||
-            fromStack.length === 0
-        ) {
-            return false;
-        }
-
-        const movingPiece =
-            fromStack[
-                fromStack.length - 1
-            ];
-
-        if (
-            movingPiece.color !==
+    validateMove(boardState, move, playerColor) {
+        const validMoves = this.getValidMoves(
+            boardState,
+            move.from,
             playerColor
-        ) {
-            return false;
-        }
+        );
 
-        /*
-         * Boş hane
-         */
-
-        if (
-            targetStack.length === 0
-        ) {
-            return true;
-        }
-
-        const topPiece =
-            targetStack[
-                targetStack.length - 1
-            ];
-
-        /*
-         * Kendi taşı
-         */
-
-        if (
-            topPiece.color ===
-            playerColor
-        ) {
-            return true;
-        }
-
-        /*
-         * Rakip tek taş
-         */
-
-        if (
-            targetStack.length === 1
-        ) {
-            return true;
-        }
-
-        /*
-         * Rakip kapalı kapı
-         */
-
-        return false;
-
+        return validMoves.includes(move.to);
     }
 
-    getLegalMoves(
-        board,
-        fromPoint,
-        diceValue,
-        playerColor
-    ) {
-
-        const moves = [];
-
-        let targetPoint;
+    getValidMoves(boardState, fromPosition, playerColor, diceValues = []) {
+        const validMoves = [];
 
         if (
+            !boardState ||
+            !boardState.points ||
+            !boardState.points[fromPosition]
+        ) {
+            return validMoves;
+        }
+
+        const sourcePoint = boardState.points[fromPosition];
+
+        if (
+            sourcePoint.color !== playerColor ||
+            sourcePoint.count <= 0
+        ) {
+            return validMoves;
+        }
+
+        if (
+            playerColor === "white" &&
+            boardState.bar.white > 0
+        ) {
+            return validMoves;
+        }
+
+        if (
+            playerColor === "black" &&
+            boardState.bar.black > 0
+        ) {
+            return validMoves;
+        }
+
+        for (const dieValue of diceValues) {
+            const targetPosition =
+                playerColor === "white"
+                    ? fromPosition - dieValue
+                    : fromPosition + dieValue;
+
+            if (
+                targetPosition < 1 ||
+                targetPosition > 24
+            ) {
+                continue;
+            }
+
+            const targetPoint =
+                boardState.points[targetPosition];
+
+            if (
+                targetPoint.count > 1 &&
+                targetPoint.color !== playerColor
+            ) {
+                continue;
+            }
+
+            validMoves.push(targetPosition);
+        }
+
+        return [...new Set(validMoves)];
+    }
+
+    canBearOff(boardState, playerColor) {
+        if (!boardState || !boardState.points) {
+            return false;
+        }
+
+        const homeRange =
             playerColor === "white"
-        ) {
+                ? [1, 6]
+                : [19, 24];
 
-            targetPoint =
-                fromPoint - diceValue;
+        for (let position = 1; position <= 24; position++) {
+            const point = boardState.points[position];
 
-        } else {
+            if (
+                point.color === playerColor &&
+                point.count > 0
+            ) {
+                const inHomeBoard =
+                    position >= homeRange[0] &&
+                    position <= homeRange[1];
 
-            targetPoint =
-                fromPoint + diceValue;
-
+                if (!inHomeBoard) {
+                    return false;
+                }
+            }
         }
 
-        if (
-            this.isValidMove(
-                board,
-                fromPoint,
-                targetPoint,
-                playerColor
-            )
-        ) {
+        return true;
+    }
 
-            moves.push(
-                targetPoint
+    hasMoves(boardState, playerColor, diceValues = []) {
+        if (!boardState || !boardState.points) {
+            return false;
+        }
+
+        for (let position = 1; position <= 24; position++) {
+            const point = boardState.points[position];
+
+            if (
+                point.color !== playerColor ||
+                point.count <= 0
+            ) {
+                continue;
+            }
+
+            const moves = this.getValidMoves(
+                boardState,
+                position,
+                playerColor,
+                diceValues
             );
 
-        }
-
-        return moves;
-
-    }
-
-    canPlayerMove(
-        board,
-        diceValues,
-        playerColor
-    ) {
-
-        for (
-            let point = 1;
-            point <= 24;
-            point++
-        ) {
-
-            const stack =
-                board.points[point];
-
-            if (
-                stack.length === 0
-            ) {
-                continue;
+            if (moves.length > 0) {
+                return true;
             }
-
-            const topPiece =
-                stack[
-                    stack.length - 1
-                ];
-
-            if (
-                topPiece.color !==
-                playerColor
-            ) {
-                continue;
-            }
-
-            for (
-                const dice of diceValues
-            ) {
-
-                const moves =
-                    this.getLegalMoves(
-                        board,
-                        point,
-                        dice,
-                        playerColor
-                    );
-
-                if (
-                    moves.length > 0
-                ) {
-                    return true;
-                }
-
-            }
-
         }
 
         return false;
-
     }
 
-    getAllLegalMoves(
-        board,
-        diceValues,
-        playerColor
-    ) {
-
-        const result = [];
-
-        for (
-            let point = 1;
-            point <= 24;
-            point++
-        ) {
-
-            const stack =
-                board.points[point];
-
-            if (
-                stack.length === 0
-            ) {
-                continue;
-            }
-
-            const topPiece =
-                stack[
-                    stack.length - 1
-                ];
-
-            if (
-                topPiece.color !==
-                playerColor
-            ) {
-                continue;
-            }
-
-            for (
-                const dice of diceValues
-            ) {
-
-                const moves =
-                    this.getLegalMoves(
-                        board,
-                        point,
-                        dice,
-                        playerColor
-                    );
-
-                moves.forEach(
-                    target => {
-
-                        result.push({
-
-                            from: point,
-
-                            to: target,
-
-                            dice
-
-                        });
-
-                    }
-                );
-
-            }
-
+    checkGameEnd(boardState) {
+        if (!boardState || !boardState.off) {
+            return {
+                isGameOver: false,
+                winner: null,
+                resultType: null
+            };
         }
 
-        return result;
+        if (boardState.off.white === 15) {
+            return {
+                isGameOver: true,
+                winner: "white",
+                resultType: "normal"
+            };
+        }
 
+        if (boardState.off.black === 15) {
+            return {
+                isGameOver: true,
+                winner: "black",
+                resultType: "normal"
+            };
+        }
+
+        return {
+            isGameOver: false,
+            winner: null,
+            resultType: null
+        };
     }
-
 }
