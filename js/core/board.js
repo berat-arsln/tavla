@@ -1,265 +1,246 @@
 // js/core/board.js
 
 export class Board {
-
-    constructor(variant = "turkish") {
-
-        this.variant = variant;
-
+    constructor() {
+        this.state = this.#createEmptyState();
     }
 
-    createBoard() {
+    initialize() {
+        this.state = this.#createInitialState();
+        return this.getState();
+    }
 
-        switch (this.variant) {
+    getState() {
+        return structuredClone(this.state);
+    }
 
-            case "turkish":
-                return this.createTurkishBoard();
+    clone() {
+        const board = new Board();
+        board.state = structuredClone(this.state);
+        return board;
+    }
 
-            default:
-                return this.createTurkishBoard();
+    moveChecker(from, to) {
+        this.#validateBoardPosition(from);
+        this.#validateBoardPosition(to);
 
+        const sourcePoint = this.state.points[from];
+
+        if (!sourcePoint.color || sourcePoint.count === 0) {
+            throw new Error("ERR_NO_CHECKER_ON_SOURCE");
         }
 
-    }
+        sourcePoint.count -= 1;
 
-    createTurkishBoard() {
-
-    const points = {};
-
-    for (let i = 1; i <= 24; i++) {
-        points[i] = [];
-    }
-
-    /*
-        Türk Tavlası Başlangıç Dizilimi
-
-        Beyaz:
-        24 -> 2
-        13 -> 5
-        8  -> 3
-        6  -> 5
-
-        Siyah:
-        1  -> 2
-        12 -> 5
-        17 -> 3
-        19 -> 5
-    */
-
-    // Beyaz
-
-    points[24] = this.createPieces(
-        "white",
-        2
-    );
-
-    points[13] = this.createPieces(
-        "white",
-        5
-    );
-
-    points[8] = this.createPieces(
-        "white",
-        3
-    );
-
-    points[6] = this.createPieces(
-        "white",
-        5
-    );
-
-    // Siyah
-
-    points[1] = this.createPieces(
-        "black",
-        2
-    );
-
-    points[12] = this.createPieces(
-        "black",
-        5
-    );
-
-    points[17] = this.createPieces(
-        "black",
-        3
-    );
-
-    points[19] = this.createPieces(
-        "black",
-        5
-    );
-
-    return {
-
-        variant: "turkish",
-
-        points,
-
-        bar: {
-            white: [],
-            black: []
-        },
-
-        borneOff: {
-            white: [],
-            black: []
+        if (sourcePoint.count === 0) {
+            sourcePoint.color = null;
         }
 
-    };
+        const targetPoint = this.state.points[to];
 
-}
-
-    createPieces(color, count) {
-
-        const pieces = [];
-
-        for (let i = 0; i < count; i++) {
-
-            pieces.push({
-                id: crypto.randomUUID(),
-                color
-            });
-
+        if (targetPoint.count === 0) {
+            targetPoint.color = sourcePoint.color;
+            targetPoint.count = 1;
+            return;
         }
 
-        return pieces;
-
-    }
-
-    getPoint(board, pointNumber) {
-
-        return board.points[pointNumber];
-
-    }
-
-    getPointCount(board, pointNumber) {
-
-        return board.points[pointNumber].length;
-
-    }
-
-    getTopPiece(board, pointNumber) {
-
-        const point = board.points[pointNumber];
-
-        if (point.length === 0) {
-            return null;
+        if (targetPoint.color !== sourcePoint.color) {
+            throw new Error("ERR_INVALID_TARGET_COLOR");
         }
 
-        return point[point.length - 1];
-
+        targetPoint.count += 1;
     }
 
-    addPiece(board, pointNumber, piece) {
+    hitChecker(position) {
+        this.#validateBoardPosition(position);
 
-        board.points[pointNumber].push(piece);
+        const point = this.state.points[position];
 
+        if (!point.color || point.count !== 1) {
+            throw new Error("ERR_INVALID_HIT");
+        }
+
+        const checkerColor = point.color;
+
+        point.color = null;
+        point.count = 0;
+
+        if (checkerColor === "white") {
+            this.state.bar.white += 1;
+        } else {
+            this.state.bar.black += 1;
+        }
     }
 
-    removePiece(board, pointNumber) {
+    enterFromBar(color, position) {
+        this.#validatePlayerColor(color);
+        this.#validateBoardPosition(position);
 
+        const targetPoint = this.state.points[position];
+
+        if (color === "white") {
+            if (this.state.bar.white <= 0) {
+                throw new Error("ERR_NO_BAR_CHECKER");
+            }
+
+            this.state.bar.white -= 1;
+        } else {
+            if (this.state.bar.black <= 0) {
+                throw new Error("ERR_NO_BAR_CHECKER");
+            }
+
+            this.state.bar.black -= 1;
+        }
+
+        if (targetPoint.count === 0) {
+            targetPoint.color = color;
+            targetPoint.count = 1;
+            return;
+        }
+
+        if (targetPoint.color !== color) {
+            throw new Error("ERR_INVALID_TARGET_COLOR");
+        }
+
+        targetPoint.count += 1;
+    }
+
+    bearOff(color, position) {
+        this.#validatePlayerColor(color);
+        this.#validateBoardPosition(position);
+
+        const point = this.state.points[position];
+
+        if (point.color !== color || point.count === 0) {
+            throw new Error("ERR_INVALID_BEAR_OFF");
+        }
+
+        point.count -= 1;
+
+        if (point.count === 0) {
+            point.color = null;
+        }
+
+        if (color === "white") {
+            this.state.off.white += 1;
+        } else {
+            this.state.off.black += 1;
+        }
+    }
+
+    reset() {
+        this.state = this.#createEmptyState();
+    }
+
+    #createEmptyState() {
+        const points = {};
+
+        for (let position = 1; position <= 24; position++) {
+            points[position] = {
+                position,
+                color: null,
+                count: 0
+            };
+        }
+
+        return {
+            points,
+
+            bar: {
+                white: 0,
+                black: 0
+            },
+
+            off: {
+                white: 0,
+                black: 0
+            }
+        };
+    }
+
+    #createInitialState() {
+        const state = this.#createEmptyState();
+
+        /*
+         * Standart Türk Tavlası başlangıç dizilimi
+         *
+         * White:
+         * 24 -> 2
+         * 13 -> 5
+         * 8  -> 3
+         * 6  -> 5
+         *
+         * Black:
+         * 1  -> 2
+         * 12 -> 5
+         * 17 -> 3
+         * 19 -> 5
+         */
+
+        state.points[24] = {
+            position: 24,
+            color: "white",
+            count: 2
+        };
+
+        state.points[13] = {
+            position: 13,
+            color: "white",
+            count: 5
+        };
+
+        state.points[8] = {
+            position: 8,
+            color: "white",
+            count: 3
+        };
+
+        state.points[6] = {
+            position: 6,
+            color: "white",
+            count: 5
+        };
+
+        state.points[1] = {
+            position: 1,
+            color: "black",
+            count: 2
+        };
+
+        state.points[12] = {
+            position: 12,
+            color: "black",
+            count: 5
+        };
+
+        state.points[17] = {
+            position: 17,
+            color: "black",
+            count: 3
+        };
+
+        state.points[19] = {
+            position: 19,
+            color: "black",
+            count: 5
+        };
+
+        return state;
+    }
+
+    #validateBoardPosition(position) {
         if (
-            board.points[pointNumber].length === 0
+            !Number.isInteger(position) ||
+            position < 1 ||
+            position > 24
         ) {
-            return null;
+            throw new Error("ERR_INVALID_POSITION");
         }
-
-        return board.points[pointNumber].pop();
-
     }
 
-    movePiece(board, fromPoint, toPoint) {
-
-        const piece =
-            this.removePiece(
-                board,
-                fromPoint
-            );
-
-        if (!piece) {
-            return false;
+    #validatePlayerColor(color) {
+        if (color !== "white" && color !== "black") {
+            throw new Error("ERR_INVALID_PLAYER");
         }
-
-        this.addPiece(
-            board,
-            toPoint,
-            piece
-        );
-
-        return true;
-
     }
-
-    sendToBar(board, piece) {
-
-        board.bar[
-            piece.color
-        ].push(piece);
-
-    }
-
-    removeFromBar(board, color) {
-
-        const bar =
-            board.bar[color];
-
-        if (bar.length === 0) {
-            return null;
-        }
-
-        return bar.pop();
-
-    }
-
-    bearOffPiece(board, piece) {
-
-        board.borneOff[
-            piece.color
-        ].push(piece);
-
-    }
-
-    getBorneOffCount(board, color) {
-
-        return board.borneOff[
-            color
-        ].length;
-
-    }
-
-    getPiecesByColor(board, color) {
-
-        const result = [];
-
-        for (let point = 1; point <= 24; point++) {
-
-            board.points[point]
-                .forEach(piece => {
-
-                    if (
-                        piece.color === color
-                    ) {
-
-                        result.push({
-                            point,
-                            piece
-                        });
-
-                    }
-
-                });
-
-        }
-
-        return result;
-
-    }
-
-    cloneBoard(board) {
-
-        return structuredClone(board);
-
-    }
-
 }
