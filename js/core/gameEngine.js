@@ -103,21 +103,20 @@ export class GameEngine {
             return false;
         }
 
-        const move = {
-            from: fromPosition,
-            to: toPosition
-        };
+        const validMoves =
+    this.moveValidator.getValidMoves(
+        this.gameState.board,
+        fromPosition,
+        this.gameState.currentPlayer,
+        this.currentDice?.values || []
+    );
 
-        const isValid =
-            this.moveValidator.validateMove(
-                this.gameState.board,
-                move,
-                this.gameState.currentPlayer
-            );
+const isValid =
+    validMoves.includes(toPosition);
 
-        if (!isValid) {
-            return false;
-        }
+if (!isValid) {
+    return false;
+}
 
         this.undoManager.pushSnapshot(
             this.gameState
