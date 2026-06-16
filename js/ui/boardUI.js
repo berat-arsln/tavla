@@ -1,407 +1,164 @@
 // js/ui/boardUI.js
 
 export class BoardUI {
-
-    constructor(boardElementId = "board") {
-
+    constructor() {
         this.boardElement =
             document.getElementById(
-                boardElementId
+                "board-render-area"
             );
 
-        this.pointClickHandler =
-            null;
+        this.diceElement =
+            document.getElementById(
+                "dice-area"
+            );
 
         this.highlightedPoints =
-            [];
-
-        this.selectedPoint =
-            null;
-
+            new Set();
     }
 
-    setPointClickHandler(handler) {
-
-        this.pointClickHandler =
-            handler;
-
-    }
-
-    createBoard() {
-
-        if (!this.boardElement) {
+    renderBoard(boardState) {
+        if (
+            !this.boardElement ||
+            !boardState ||
+            !boardState.points
+        ) {
             return;
         }
 
         this.boardElement.innerHTML = "";
 
-        const board =
-            document.createElement("div");
-
-        board.className =
-            "backgammon-board";
-
-        /*
-         * ÜST SATIR
-         */
-
-        const topRow =
-            document.createElement("div");
-
-        topRow.className =
-            "board-row";
-
-        /*
-         * ALT SATIR
-         */
-
-        const bottomRow =
-            document.createElement("div");
-
-        bottomRow.className =
-            "board-row";
-
-        /*
-         * ÜST SOL
-         * 13-18
-         */
-
-        topRow.appendChild(
-
-            this.createQuadrant(
-                [13,14,15,16,17,18],
-                "top"
-            )
-
-        );
-
-        /*
-         * ORTA BAR
-         */
-
-        topRow.appendChild(
-            this.createCenterBar()
-        );
-
-        /*
-         * ÜST SAĞ
-         * 19-24
-         */
-
-        topRow.appendChild(
-
-            this.createQuadrant(
-                [19,20,21,22,23,24],
-                "top"
-            )
-
-        );
-
-        /*
-         * ALT SOL
-         * 12-7
-         */
-
-        bottomRow.appendChild(
-
-            this.createQuadrant(
-                [12,11,10,9,8,7],
-                "bottom"
-            )
-
-        );
-
-        bottomRow.appendChild(
-            this.createCenterBar()
-        );
-
-        /*
-         * ALT SAĞ
-         * 6-1
-         */
-
-        bottomRow.appendChild(
-
-            this.createQuadrant(
-                [6,5,4,3,2,1],
-                "bottom"
-            )
-
-        );
-
-        board.appendChild(
-            topRow
-        );
-
-        board.appendChild(
-            bottomRow
-        );
-
-        const bearOff =
-            document.createElement("div");
-
-        bearOff.className =
-            "bearoff-zone";
-
-        board.appendChild(
-            bearOff
-        );
-
-        this.boardElement.appendChild(
-            board
-        );
-
-    }
-
-    createCenterBar() {
-
-        const bar =
-            document.createElement("div");
-
-        bar.className =
-            "center-bar";
-
-        return bar;
-
-    }
-
-    createQuadrant(
-        points,
-        side
-    ) {
-
-        const quadrant =
-            document.createElement("div");
-
-        quadrant.className =
-            "quadrant";
-
-        points.forEach(point => {
-
-            quadrant.appendChild(
-
-                this.createPoint(
-                    point,
-                    side
-                )
-
-            );
-
-        });
-
-        return quadrant;
-
-    }
-
-    createPoint(
-        pointNumber,
-        side
-    ) {
-
-        const point =
-            document.createElement("div");
-
-        point.className =
-            `point ${side}`;
-
-        point.dataset.point =
-            pointNumber;
-
-        const number =
-            document.createElement("div");
-
-        number.className =
-            "point-number";
-
-        number.textContent =
-            pointNumber;
-
-        const container =
-            document.createElement("div");
-
-        container.className =
-            "checker-container";
-
-        point.appendChild(number);
-
-        point.appendChild(
-            container
-        );
-
-        point.addEventListener(
-            "click",
-            () => {
-
-                if (
-                    this.pointClickHandler
-                ) {
-
-                    this.pointClickHandler(
-                        pointNumber
-                    );
-
-                }
-
-            }
-        );
-
-        return point;
-
-    }
-
-    renderBoard(board) {
-
-        if (!board) {
-            return;
-        }
-
-        document
-            .querySelectorAll(
-                ".checker-container"
-            )
-            .forEach(container => {
-
-                container.innerHTML =
-                    "";
-
-            });
-
         for (
-            let point = 1;
-            point <= 24;
-            point++
+            let position = 1;
+            position <= 24;
+            position++
         ) {
+            const pointData =
+                boardState.points[position];
 
-            const pointContainer =
-                document.querySelector(
+            const pointElement =
+                document.createElement("div");
 
-                    `[data-point="${point}"] .checker-container`
+            pointElement.className =
+                "board-point";
 
-                );
+            pointElement.dataset.position =
+                String(position);
+
+            const label =
+                document.createElement("span");
+
+            label.className =
+                "board-point__label";
+
+            label.textContent =
+                String(position);
+
+            pointElement.appendChild(
+                label
+            );
 
             if (
-                !pointContainer
+                pointData &&
+                pointData.count > 0
             ) {
-                continue;
+                for (
+                    let i = 0;
+                    i < pointData.count;
+                    i++
+                ) {
+                    const checker =
+                        document.createElement(
+                            "div"
+                        );
+
+                    checker.className =
+                        `checker checker--${pointData.color}`;
+
+                    checker.dataset.position =
+                        String(position);
+
+                    pointElement.appendChild(
+                        checker
+                    );
+                }
             }
 
-            const pieces =
-                board.points[point];
-
-            pieces.forEach(piece => {
-
-                const checker =
-                    document.createElement(
-                        "div"
-                    );
-
-                checker.className =
-                    `checker ${piece.color}`;
-
-                pointContainer.appendChild(
-                    checker
-                );
-
-            });
-
-        }
-
-    }
-
-    updateBoard(board) {
-
-        this.renderBoard(
-            board
-        );
-
-    }
-
-    selectPoint(pointNumber) {
-
-        this.clearSelection();
-
-        const point =
-            document.querySelector(
-
-                `[data-point="${pointNumber}"]`
-
+            this.boardElement.appendChild(
+                pointElement
             );
+        }
+    }
 
-        if (!point) {
+    renderDice(diceData) {
+        if (!this.diceElement) {
             return;
         }
 
-        point.classList.add(
-            "selected"
-        );
+        const diceValues =
+            this.diceElement.querySelectorAll(
+                ".dice__value"
+            );
 
-        this.selectedPoint =
-            pointNumber;
+        if (
+            !diceData ||
+            !diceValues.length
+        ) {
+            diceValues.forEach(
+                (element) => {
+                    element.textContent = "-";
+                }
+            );
 
+            return;
+        }
+
+        if (diceValues[0]) {
+            diceValues[0].textContent =
+                String(diceData.dieOne);
+        }
+
+        if (diceValues[1]) {
+            diceValues[1].textContent =
+                String(diceData.dieTwo);
+        }
     }
 
-    clearSelection() {
-
-        document
-            .querySelectorAll(
-                ".selected"
-            )
-            .forEach(element => {
-
-                element.classList.remove(
-                    "selected"
-                );
-
-            });
-
-        this.selectedPoint =
-            null;
-
-    }
-
-    highlightMoves(points) {
-
+    highlightMoves(positions = []) {
         this.clearHighlights();
 
-        points.forEach(point => {
-
-            const element =
-                document.querySelector(
-
-                    `[data-point="${point}"]`
-
+        positions.forEach((position) => {
+            const point =
+                this.boardElement.querySelector(
+                    `[data-position="${position}"]`
                 );
 
-            if (!element) {
+            if (!point) {
                 return;
             }
 
-            element.classList.add(
-                "possible-move"
+            point.classList.add(
+                "board-point--highlight"
             );
 
-            this.highlightedPoints.push(
-                element
+            this.highlightedPoints.add(
+                point
             );
-
         });
-
     }
 
     clearHighlights() {
-
-        this.highlightedPoints
-            .forEach(element => {
-
-                element.classList.remove(
-                    "possible-move"
+        this.highlightedPoints.forEach(
+            (point) => {
+                point.classList.remove(
+                    "board-point--highlight"
                 );
+            }
+        );
 
-            });
-
-        this.highlightedPoints =
-            [];
-
+        this.highlightedPoints.clear();
     }
 
+    updateBoard(boardState) {
+        this.renderBoard(boardState);
+    }
 }
