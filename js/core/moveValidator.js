@@ -4,314 +4,137 @@ export class MoveValidator {
 
     constructor() {
 
-        this.directions = {
-
-            white: -1,
-            black: 1
-
-        };
+        this.variant = "turkish";
 
     }
 
-    validateMove({
+    isValidMove(
         board,
-        player,
-        from,
-        to,
-        diceValues
-    }) {
+        fromPoint,
+        toPoint,
+        playerColor
+    ) {
 
-        const point =
-            board.points[from];
-
-        if (!point.length) {
-
-            return {
-                valid: false,
-                reason: "Kaynak hanede taş yok."
-            };
-
+        if (
+            fromPoint < 1 ||
+            fromPoint > 24
+        ) {
+            return false;
         }
 
-        const piece =
-            point[
-                point.length - 1
+        if (
+            toPoint < 1 ||
+            toPoint > 24
+        ) {
+            return false;
+        }
+
+        const fromStack =
+            board.points[fromPoint];
+
+        const targetStack =
+            board.points[toPoint];
+
+        if (
+            !fromStack ||
+            fromStack.length === 0
+        ) {
+            return false;
+        }
+
+        const movingPiece =
+            fromStack[
+                fromStack.length - 1
             ];
 
         if (
-            piece.color !== player
+            movingPiece.color !==
+            playerColor
         ) {
-
-            return {
-                valid: false,
-                reason:
-                    "Bu taş sana ait değil."
-            };
-
+            return false;
         }
 
-        const distance =
-            this.calculateDistance(
-                player,
-                from,
-                to
-            );
-
-        const usableDice =
-            this.findUsableDice(
-                distance,
-                diceValues
-            );
-
-        if (!usableDice.valid) {
-
-            return {
-                valid: false,
-                reason:
-                    "Zar ile uyumlu hamle değil."
-            };
-
-        }
+        /*
+         * Boş hane
+         */
 
         if (
-            !this.isPointOpen(
-                board,
-                player,
-                to
-            )
+            targetStack.length === 0
         ) {
-
-            return {
-                valid: false,
-                reason:
-                    "Hedef hane kapalı."
-            };
-
-        }
-
-        return {
-
-            valid: true,
-
-            distance,
-
-            usedDice:
-                usableDice.usedDice
-
-        };
-
-    }
-
-    calculateDistance(
-        player,
-        from,
-        to
-    ) {
-
-        if (player === "white") {
-
-            return from - to;
-
-        }
-
-        return to - from;
-
-    }
-
-    isPointOpen(
-        board,
-        player,
-        pointNumber
-    ) {
-
-        const point =
-            board.points[
-                pointNumber
-            ];
-
-        if (
-            point.length === 0
-        ) {
-
             return true;
-
         }
 
         const topPiece =
-            point[
-                point.length - 1
+            targetStack[
+                targetStack.length - 1
             ];
 
-        return (
+        /*
+         * Kendi taşı
+         */
+
+        if (
             topPiece.color ===
-            player
-        );
-
-    }
-
-    findUsableDice(
-        distance,
-        diceValues
-    ) {
-
-        const single =
-            this.checkSingleDie(
-                distance,
-                diceValues
-            );
-
-        if (single.valid) {
-
-            return single;
-
-        }
-
-        const combined =
-            this.checkCombinedDice(
-                distance,
-                diceValues
-            );
-
-        if (combined.valid) {
-
-            return combined;
-
-        }
-
-        return {
-            valid: false
-        };
-
-    }
-
-    checkSingleDie(
-        distance,
-        diceValues
-    ) {
-
-        for (
-            let i = 0;
-            i < diceValues.length;
-            i++
+            playerColor
         ) {
-
-            if (
-                diceValues[i] ===
-                distance
-            ) {
-
-                return {
-
-                    valid: true,
-
-                    usedDice: [
-                        i
-                    ]
-
-                };
-
-            }
-
+            return true;
         }
 
-        return {
-            valid: false
-        };
-
-    }
-
-    checkCombinedDice(
-        distance,
-        diceValues
-    ) {
+        /*
+         * Rakip tek taş
+         */
 
         if (
-            diceValues.length < 2
+            targetStack.length === 1
         ) {
-
-            return {
-                valid: false
-            };
-
+            return true;
         }
 
-        const total =
-            diceValues.reduce(
-                (sum, value) =>
-                    sum + value,
-                0
-            );
+        /*
+         * Rakip kapalı kapı
+         */
 
-        if (
-            total === distance
-        ) {
-
-            return {
-
-                valid: true,
-
-                usedDice:
-                    diceValues.map(
-                        (
-                            _,
-                            index
-                        ) => index
-                    )
-
-            };
-
-        }
-
-        return {
-            valid: false
-        };
+        return false;
 
     }
 
-    getPossibleMoves({
+    getLegalMoves(
         board,
-        player,
-        point,
-        diceValues
-    }) {
+        fromPoint,
+        diceValue,
+        playerColor
+    ) {
 
         const moves = [];
 
-        for (
-            let target = 1;
-            target <= 24;
-            target++
+        let targetPoint;
+
+        if (
+            playerColor === "white"
         ) {
 
-            const result =
-                this.validateMove({
+            targetPoint =
+                fromPoint - diceValue;
 
-                    board,
+        } else {
 
-                    player,
+            targetPoint =
+                fromPoint + diceValue;
 
-                    from: point,
+        }
 
-                    to: target,
+        if (
+            this.isValidMove(
+                board,
+                fromPoint,
+                targetPoint,
+                playerColor
+            )
+        ) {
 
-                    diceValues
-
-                });
-
-            if (
-                result.valid
-            ) {
-
-                moves.push({
-
-                    target,
-
-                    usedDice:
-                        result.usedDice
-
-                });
-
-            }
+            moves.push(
+                targetPoint
+            );
 
         }
 
@@ -319,11 +142,11 @@ export class MoveValidator {
 
     }
 
-    hasAnyLegalMove({
+    canPlayerMove(
         board,
-        player,
-        diceValues
-    }) {
+        diceValues,
+        playerColor
+    ) {
 
         for (
             let point = 1;
@@ -331,57 +154,121 @@ export class MoveValidator {
             point++
         ) {
 
-            const pieces =
-                board.points[
-                    point
-                ];
+            const stack =
+                board.points[point];
 
             if (
-                !pieces.length
+                stack.length === 0
             ) {
-
                 continue;
-
             }
 
             const topPiece =
-                pieces[
-                    pieces.length - 1
+                stack[
+                    stack.length - 1
                 ];
 
             if (
                 topPiece.color !==
-                player
+                playerColor
             ) {
-
                 continue;
-
             }
 
-            const possibleMoves =
-                this.getPossibleMoves({
-
-                    board,
-
-                    player,
-
-                    point,
-
-                    diceValues
-
-                });
-
-            if (
-                possibleMoves.length
+            for (
+                const dice of diceValues
             ) {
 
-                return true;
+                const moves =
+                    this.getLegalMoves(
+                        board,
+                        point,
+                        dice,
+                        playerColor
+                    );
+
+                if (
+                    moves.length > 0
+                ) {
+                    return true;
+                }
 
             }
 
         }
 
         return false;
+
+    }
+
+    getAllLegalMoves(
+        board,
+        diceValues,
+        playerColor
+    ) {
+
+        const result = [];
+
+        for (
+            let point = 1;
+            point <= 24;
+            point++
+        ) {
+
+            const stack =
+                board.points[point];
+
+            if (
+                stack.length === 0
+            ) {
+                continue;
+            }
+
+            const topPiece =
+                stack[
+                    stack.length - 1
+                ];
+
+            if (
+                topPiece.color !==
+                playerColor
+            ) {
+                continue;
+            }
+
+            for (
+                const dice of diceValues
+            ) {
+
+                const moves =
+                    this.getLegalMoves(
+                        board,
+                        point,
+                        dice,
+                        playerColor
+                    );
+
+                moves.forEach(
+                    target => {
+
+                        result.push({
+
+                            from: point,
+
+                            to: target,
+
+                            dice
+
+                        });
+
+                    }
+                );
+
+            }
+
+        }
+
+        return result;
 
     }
 
