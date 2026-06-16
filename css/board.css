@@ -1,387 +1,226 @@
-/* =========================
-   BOARD CONTAINER
-========================= */
+/* css/board.css */
 
-#board-container {
+#board-render-area {
+    display: grid;
 
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    grid-template-columns: repeat(12, 1fr);
 
-}
+    gap: 0.5rem;
 
-/* =========================
-   MAIN BOARD
-========================= */
+    padding: 1rem;
 
-.backgammon-board {
+    background: linear-gradient(
+        180deg,
+        #d6b17c 0%,
+        #c49357 100%
+    );
 
-    position: relative;
+    border-radius: 16px;
 
-    width: min(95vw, 1200px);
-    aspect-ratio: 2 / 1;
-
-    display: flex;
-    flex-direction: column;
-
-    background:
-        linear-gradient(
-            135deg,
-            #8a5a32,
-            #b67d49
-        );
-
-    border: 14px solid #4e2f17;
-
-    border-radius: 18px;
+    border: 4px solid #7b5326;
 
     box-shadow:
-        0 0 25px rgba(0,0,0,.4),
-        inset 0 0 15px rgba(0,0,0,.25);
+        inset 0 2px 6px rgba(0, 0, 0, 0.2),
+        0 6px 18px rgba(0, 0, 0, 0.15);
 
-    overflow: hidden;
-
+    min-height: 520px;
 }
 
-/* =========================
-   BOARD ROWS
-========================= */
-
-.board-row {
-
-    flex: 1;
+.board-point {
+    position: relative;
 
     display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
 
+    gap: 0.2rem;
+
+    min-height: 220px;
+
+    padding: 0.5rem 0.25rem;
+
+    border-radius: 8px;
+
+    transition:
+        background 0.15s ease,
+        transform 0.15s ease;
 }
 
-/* =========================
-   QUADRANTS
-========================= */
-
-.quadrant {
-
-    flex: 1;
-
-    display: flex;
-
+.board-point:hover {
+    background: rgba(
+        255,
+        255,
+        255,
+        0.15
+    );
 }
 
-/* =========================
-   CENTER BAR
-========================= */
+.board-point__label {
+    position: absolute;
 
-.center-bar {
+    top: 4px;
+    left: 4px;
 
-    width: 28px;
+    font-size: 0.7rem;
+    font-weight: 700;
 
-    background:
-        linear-gradient(
-            to right,
-            #5a3418,
-            #8d5b34,
-            #5a3418
+    color: rgba(
+        0,
+        0,
+        0,
+        0.55
+    );
+
+    user-select: none;
+}
+
+.board-point--highlight {
+    background: rgba(
+        255,
+        215,
+        0,
+        0.25
+    );
+
+    outline: 3px solid
+        rgba(
+            255,
+            215,
+            0,
+            0.75
         );
-
-    box-shadow:
-        inset 0 0 8px rgba(0,0,0,.4);
-
 }
-
-/* =========================
-   POINTS
-========================= */
-
-.point {
-
-    position: relative;
-
-    flex: 1;
-
-    display: flex;
-    align-items: center;
-
-    cursor: pointer;
-
-}
-
-/* ÜST ÜÇGENLER */
-
-.point.top {
-
-    justify-content: flex-start;
-
-}
-
-.point.top::before {
-
-    content: "";
-
-    position: absolute;
-
-    top: 0;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    width: 0;
-    height: 0;
-
-    border-left: 32px solid transparent;
-    border-right: 32px solid transparent;
-    border-top: 240px solid #f2e3c2;
-
-}
-
-/* ALT ÜÇGENLER */
-
-.point.bottom {
-
-    justify-content: flex-end;
-
-}
-
-.point.bottom::before {
-
-    content: "";
-
-    position: absolute;
-
-    bottom: 0;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    width: 0;
-    height: 0;
-
-    border-left: 32px solid transparent;
-    border-right: 32px solid transparent;
-    border-bottom: 240px solid #f2e3c2;
-
-}
-
-/* RENK DEĞİŞİMİ */
-
-.point:nth-child(even).top::before {
-
-    border-top-color: #7b3f20;
-
-}
-
-.point:nth-child(even).bottom::before {
-
-    border-bottom-color: #7b3f20;
-
-}
-
-/* =========================
-   POINT NUMBERS
-========================= */
-
-.point-number {
-
-    position: absolute;
-
-    z-index: 20;
-
-    color: white;
-
-    font-weight: bold;
-
-    text-shadow:
-        0 0 4px black;
-
-    font-size: .9rem;
-
-}
-
-.point.top .point-number {
-
-    top: 8px;
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-}
-
-.point.bottom .point-number {
-
-    bottom: 8px;
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-}
-
-/* =========================
-   CHECKER STACK
-========================= */
-
-.checker-container {
-
-    position: relative;
-
-    z-index: 10;
-
-    width: 100%;
-
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 2px;
-
-}
-
-/* =========================
-   CHECKERS
-========================= */
 
 .checker {
-
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
 
     border-radius: 50%;
 
-    border: 2px solid rgba(0,0,0,.4);
+    flex-shrink: 0;
+
+    border: 2px solid
+        rgba(
+            0,
+            0,
+            0,
+            0.25
+        );
 
     box-shadow:
-        0 3px 6px rgba(0,0,0,.4);
+        inset 0 2px 4px rgba(255, 255, 255, 0.35),
+        0 2px 4px rgba(0, 0, 0, 0.25);
 
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
 }
 
-.checker.white {
+.checker:hover {
+    transform: scale(1.05);
+}
 
+.checker--white {
     background:
         radial-gradient(
             circle at 35% 35%,
             #ffffff,
-            #d9d9d9
+            #dcdcdc
         );
-
 }
 
-.checker.black {
-
+.checker--black {
     background:
         radial-gradient(
             circle at 35% 35%,
-            #555,
-            #111
+            #5f5f5f,
+            #151515
+        );
+}
+
+.board-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 60px;
+
+    padding: 0.75rem;
+
+    border-radius: 12px;
+
+    background: rgba(
+        0,
+        0,
+        0,
+        0.08
+    );
+}
+
+.board-bar__count {
+    font-weight: 700;
+}
+
+.board-off {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 60px;
+
+    padding: 0.75rem;
+
+    border-radius: 12px;
+
+    background: rgba(
+        255,
+        255,
+        255,
+        0.15
+    );
+}
+
+.board-off__count {
+    font-weight: 700;
+}
+
+#dice-area {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.dice__value {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+
+    border: 2px solid
+        rgba(
+            0,
+            0,
+            0,
+            0.15
         );
 
-}
+    border-radius: 10px;
 
-/* =========================
-   BEAR OFF
-========================= */
+    font-size: 1.25rem;
+    font-weight: 700;
 
-.bearoff-zone {
-
-    position: absolute;
-
-    right: 0;
-
-    top: 0;
-
-    width: 38px;
-    height: 100%;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #5f3618,
-            #7e4f2b
+    box-shadow:
+        0 2px 6px rgba(
+            0,
+            0,
+            0,
+            0.15
         );
-
-}
-
-/* =========================
-   MOVE HIGHLIGHT
-========================= */
-
-.possible-move {
-
-    filter:
-        drop-shadow(
-            0 0 12px #00ff88
-        );
-
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 768px) {
-
-    .backgammon-board {
-
-        width: 96vw;
-
-    }
-
-    .point.top::before {
-
-        border-left: 18px solid transparent;
-        border-right: 18px solid transparent;
-        border-top: 120px solid #f2e3c2;
-
-    }
-
-    .point.bottom::before {
-
-        border-left: 18px solid transparent;
-        border-right: 18px solid transparent;
-        border-bottom: 120px solid #f2e3c2;
-
-    }
-
-    .point:nth-child(even).top::before {
-
-        border-top-color: #7b3f20;
-
-    }
-
-    .point:nth-child(even).bottom::before {
-
-        border-bottom-color: #7b3f20;
-
-    }
-
-    .checker {
-
-        width: 28px;
-        height: 28px;
-
-    }
-
-    .point-number {
-
-        font-size: .7rem;
-
-    }
-
-}
-
-/* =========================
-   TABLET
-========================= */
-
-@media (min-width: 769px)
-and (max-width: 1200px) {
-
-    .checker {
-
-        width: 34px;
-        height: 34px;
-
-    }
-
 }
