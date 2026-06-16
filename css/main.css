@@ -1,0 +1,460 @@
+/* =========================
+   ROOT
+========================= */
+
+:root {
+
+    --bg-primary: #f5f3ee;
+    --bg-secondary: #ffffff;
+
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+
+    --accent: #8b5e34;
+    --accent-hover: #6f4928;
+
+    --border-color: #d6d3d1;
+
+    --success: #16a34a;
+    --warning: #f59e0b;
+    --danger: #dc2626;
+
+    --shadow:
+        0 10px 25px rgba(
+            0,
+            0,
+            0,
+            0.12
+        );
+
+    --radius: 14px;
+
+    --transition:
+        0.25s ease;
+
+}
+
+/* =========================
+   DARK MODE
+========================= */
+
+body.dark {
+
+    --bg-primary: #151515;
+    --bg-secondary: #202020;
+
+    --text-primary: #f3f4f6;
+    --text-secondary: #b4b4b4;
+
+    --accent: #b3834e;
+    --accent-hover: #d39b5b;
+
+    --border-color: #353535;
+
+}
+
+/* =========================
+   RESET
+========================= */
+
+* {
+
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+
+html {
+
+    scroll-behavior: smooth;
+
+}
+
+body {
+
+    min-height: 100vh;
+
+    background:
+        var(--bg-primary);
+
+    color:
+        var(--text-primary);
+
+    font-family:
+
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    transition:
+        background var(--transition),
+        color var(--transition);
+
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar {
+
+    width: 10px;
+
+}
+
+::-webkit-scrollbar-track {
+
+    background:
+        var(--bg-secondary);
+
+}
+
+::-webkit-scrollbar-thumb {
+
+    background:
+        var(--accent);
+
+    border-radius: 999px;
+
+}
+
+/* =========================
+   APP
+========================= */
+
+#app {
+
+    width: 100%;
+    min-height: 100vh;
+
+}
+
+/* =========================
+   SCREENS
+========================= */
+
+.screen {
+
+    padding: 16px;
+
+}
+
+.hidden {
+
+    display: none !important;
+
+}
+
+.active {
+
+    display: block;
+
+}
+
+/* =========================
+   HEADERS
+========================= */
+
+.main-header,
+.screen-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+
+}
+
+.main-header h1,
+.screen-header h2 {
+
+    font-size: 1.5rem;
+    font-weight: 700;
+
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+
+    border: none;
+
+    cursor: pointer;
+
+    border-radius:
+        var(--radius);
+
+    transition:
+        var(--transition);
+
+}
+
+.menu-buttons {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    max-width: 420px;
+
+    margin: 40px auto;
+
+}
+
+.menu-buttons button {
+
+    padding: 16px;
+
+    background:
+        var(--accent);
+
+    color: white;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+}
+
+.menu-buttons button:hover {
+
+    background:
+        var(--accent-hover);
+
+}
+
+.back-btn {
+
+    width: 42px;
+    height: 42px;
+
+    font-size: 1.2rem;
+
+    background:
+        var(--bg-secondary);
+
+    color:
+        var(--text-primary);
+
+    border:
+        1px solid
+        var(--border-color);
+
+}
+
+/* =========================
+   FORMS
+========================= */
+
+input,
+select,
+textarea {
+
+    width: 100%;
+
+    padding: 12px;
+
+    border-radius:
+        var(--radius);
+
+    border:
+        1px solid
+        var(--border-color);
+
+    background:
+        var(--bg-secondary);
+
+    color:
+        var(--text-primary);
+
+    outline: none;
+
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+
+    border-color:
+        var(--accent);
+
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.profile-card {
+
+    background:
+        var(--bg-secondary);
+
+    border:
+        1px solid
+        var(--border-color);
+
+    border-radius:
+        var(--radius);
+
+    box-shadow:
+        var(--shadow);
+
+    padding: 20px;
+
+}
+
+/* =========================
+   AVATAR
+========================= */
+
+.avatar {
+
+    width: 100px;
+    height: 100px;
+
+    margin: 0 auto 15px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 3rem;
+
+    background:
+        var(--accent);
+
+    color: white;
+
+}
+
+/* =========================
+   SETTINGS
+========================= */
+
+.settings-group {
+
+    margin-bottom: 24px;
+
+    padding: 16px;
+
+    background:
+        var(--bg-secondary);
+
+    border:
+        1px solid
+        var(--border-color);
+
+    border-radius:
+        var(--radius);
+
+}
+
+.settings-group h3 {
+
+    margin-bottom: 12px;
+
+}
+
+/* =========================
+   NOTIFICATIONS
+========================= */
+
+#notification-container {
+
+    position: fixed;
+
+    top: 15px;
+    right: 15px;
+
+    z-index: 9999;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+/* =========================
+   GAME
+========================= */
+
+#game-screen {
+
+    padding: 0;
+
+    min-height: 100vh;
+
+}
+
+#game-layout {
+
+    width: 100%;
+
+}
+
+/* =========================
+   CHAT
+========================= */
+
+#chat-panel {
+
+    background:
+        var(--bg-secondary);
+
+}
+
+/* =========================
+   HISTORY
+========================= */
+
+#history-panel {
+
+    background:
+        var(--bg-secondary);
+
+}
+
+/* =========================
+   UTILITIES
+========================= */
+
+.text-center {
+
+    text-align: center;
+
+}
+
+.mt-10 {
+
+    margin-top: 10px;
+
+}
+
+.mt-20 {
+
+    margin-top: 20px;
+
+}
+
+.mt-30 {
+
+    margin-top: 30px;
+
+}
